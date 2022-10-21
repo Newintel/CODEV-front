@@ -2,5 +2,6 @@
   "arrowParens": "avoid",
   "bracketSameLine": true,
   "singleQuote": true,
-  "trailingComma": "all"
+  "trailingComma": "all",
+  "tabWidth": 4
 }
