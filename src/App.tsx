@@ -6,8 +6,12 @@ import { E_MenuType } from './types';
 import Search from './components/pages/search/Search';
 import Home from './components/pages/home/Home';
 import MyAccount from './components/pages/my-account/MyAccount';
+import Login from './components/pages/login/Login';
+import { NativeBaseProvider } from 'native-base';
 
 const App = () => {
+    const [isLogged, setIsLogged] = React.useState(false);
+
     const BottomMenu = MenuFactory(E_MenuType.BOTTOM, {
         Home: { component: Home, icon: 'home-circle', name: 'Menu principal' },
         Search: {
@@ -26,9 +30,15 @@ const App = () => {
     });
 
     return (
-        <NavigationContainer>
-            <SideMenu />
-        </NavigationContainer>
+        <NativeBaseProvider>
+            {isLogged ? (
+                <NavigationContainer>
+                    <SideMenu />
+                </NavigationContainer>
+            ) : (
+                <Login onLogin={setIsLogged} />
+            )}
+        </NativeBaseProvider>
     );
 };
 
