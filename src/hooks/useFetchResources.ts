@@ -45,7 +45,6 @@ const useFetchResources = <R extends FetchResources>(props: I_Props<R>) => {
                 headers,
             })
                 .then(async res => {
-                    console.log(res);
                     if (res.ok) {
                         res.json().then(json => {
                             setData(json);

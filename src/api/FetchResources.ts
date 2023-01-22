@@ -1,4 +1,4 @@
-import { I_SignupResponse } from './resources/auth';
+import { I_SignupResponse, I_AuthCheck } from './resources/auth';
 import {
     I_LoginRequest,
     I_NFCLoginRequest as I_NfcLoginRequest,
@@ -10,6 +10,7 @@ export enum FetchResources {
     SIGNUP = 'auth/signup',
     ADD_CARD = 'auth/nfc/id',
     LOGIN_NFC = 'auth/nfc/login',
+    CHECK_TOKEN = 'auth/check',
 }
 
 export type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -33,6 +34,11 @@ export type ResourcesProps = {
         I_NfcLoginRequest,
         string,
         'POST'
+    >;
+    [FetchResources.CHECK_TOKEN]: FetchResourcesType<
+        I_AuthCheck,
+        string,
+        'GET'
     >;
 };
 

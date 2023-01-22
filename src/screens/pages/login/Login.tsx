@@ -33,7 +33,7 @@ import { useCallback } from 'react';
 import useNfcManager from '../../../hooks/useNfcManager';
 
 const Login = () => {
-    const { getState, navigate } =
+    const { getState, reset } =
         useNavigation<NavigationProp<I_NavigationParams>>();
 
     const { setItem, removeItem } = useEncryptedStorage();
@@ -63,7 +63,6 @@ const Login = () => {
         data: token,
         fetchData: _login,
         isFetching: isLoginFetching,
-        isFetched: isLoginFetched,
     } = useFetchResources({
         resource: FetchResources.LOGIN,
         method: 'POST',
@@ -73,7 +72,6 @@ const Login = () => {
         data: nfcToken,
         fetchData: nfcLogin,
         isFetching: isNfcLoginFetching,
-        isFetched: isNfcLoginFetched,
     } = useFetchResources({
         resource: FetchResources.LOGIN_NFC,
         method: 'POST',
@@ -125,10 +123,24 @@ const Login = () => {
         });
     }, [removeItem]);
 
+    const setToken = useCallback(
+        (tok: string) => {
+            setItem({
+                key: E_Storage.TOKEN,
+                value: tok,
+                onSuccess: () => {
+                    reset({
+                        index: 0,
+                        routes: [{ name: Screens.Main }],
+                    });
+                },
+            });
+        },
+        [setItem, reset]
+    );
+
     useEffect(() => {
         if (readTag?.id !== undefined) {
-            console.debug('Nfc tag read');
-            console.debug({ readTag });
             nfcLogin({
                 nfc: readTag.id,
             });
@@ -137,29 +149,18 @@ const Login = () => {
 
     useEffect(() => {
         if (nfcToken !== undefined) {
-            console.debug('Nfc login fetched');
-            setItem({
-                key: E_Storage.TOKEN,
-                value: nfcToken,
-                onSuccess: () => navigate(Screens.Main),
-            });
+            setToken(nfcToken);
         }
-    }, [isNfcLoginFetched, navigate, nfcToken, setItem]);
+    }, [nfcToken, setToken]);
 
     useEffect(() => {
         if (token !== undefined) {
-            setItem({
-                key: E_Storage.TOKEN,
-                value: token,
-                onSuccess: () => navigate(Screens.Main),
-            });
+            setToken(token);
         }
-    }, [token, setItem, navigate]);
+    }, [setToken, token]);
 
     useEffect(() => {
         if (stateParams && isRegisterFetched) {
-            console.debug('Login or register fetched and link used');
-            console.debug({ stateParams });
             if (stateParams.error !== undefined) {
                 Toast.show({
                     title: 'Error',
@@ -171,14 +172,10 @@ const Login = () => {
             }
 
             if (stateParams.access_token !== undefined) {
-                setItem({
-                    key: E_Storage.TOKEN,
-                    value: stateParams.access_token,
-                    onSuccess: () => navigate(Screens.Main),
-                });
+                setToken(stateParams.access_token);
             }
         }
-    }, [stateParams, isLoginFetched, navigate, setItem, isRegisterFetched]);
+    }, [isRegisterFetched, setToken, stateParams]);
 
     return (
         <View flex={1} backgroundColor={'blue.100'}>

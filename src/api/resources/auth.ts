@@ -22,3 +22,7 @@ export interface I_SignupResponse {
     email: string;
     sent_at: string;
 }
+
+export interface I_AuthCheck {
+    token: string;
+}
