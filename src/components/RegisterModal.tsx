@@ -1,6 +1,8 @@
 import {
+    Box,
     Button,
     FormControl,
+    HStack,
     Input,
     InputGroup,
     InputRightAddon,
@@ -12,6 +14,8 @@ import {
 } from 'native-base';
 import React, { useCallback } from 'react';
 import { FetchResources, FetchResourcesCallback } from '../api/FetchResources';
+import useNfcManager from '../hooks/useNfcManager';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface I_Props {
     onClose?: () => void;
@@ -22,6 +26,8 @@ interface I_Props {
 
 const RegisterModal = (props: I_Props) => {
     const { onClose, isOpen, register, isFetching } = props;
+
+    const { readTag, readNfc, isReading } = useNfcManager();
 
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
@@ -51,9 +57,9 @@ const RegisterModal = (props: I_Props) => {
         register({
             email: `${email}@etu.univ-lyon1.fr`,
             password,
-            nfc: 'this is nfc',
+            nfc: readTag?.id,
         });
-    }, [email, password, register]);
+    }, [email, password, register, readTag]);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
@@ -99,6 +105,30 @@ const RegisterModal = (props: I_Props) => {
                                 onChangeText={setPassword}
                             />
                         </FormControl>
+                        <HStack>
+                            <Skeleton
+                                isLoaded={isReading === false}
+                                width={'75%'}>
+                                <Button
+                                    colorScheme="primary"
+                                    onPress={readNfc}
+                                    mr="3"
+                                    width={'75%'}>
+                                    Read student card
+                                </Button>
+                            </Skeleton>
+                            <Box>
+                                <Icon
+                                    name={
+                                        readTag?.id
+                                            ? 'check-bold'
+                                            : 'close-thick'
+                                    }
+                                    size={40}
+                                    color={readTag?.id ? 'green' : 'red'}
+                                />
+                            </Box>
+                        </HStack>
                     </VStack>
                 </Modal.Body>
                 <Modal.Footer>

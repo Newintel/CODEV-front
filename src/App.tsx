@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 
-import MenuFactory from './screens/menu/MenuFactory';
+import MenuFactory from './components/menu/MenuFactory';
 import { E_MenuType } from './types';
 import Search from './screens/pages/search/Search';
 import Home from './screens/pages/home/Home';

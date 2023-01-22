@@ -7,7 +7,7 @@ export interface I_NFCLoginRequest {
     nfc: string;
 }
 
-export interface I_LoginResponse {
+export interface I_LinkRegister {
     access_token?: string;
     refresh_token?: string;
     expires_in?: number;

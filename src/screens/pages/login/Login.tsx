@@ -11,6 +11,7 @@ import {
     InputRightAddon,
     Link,
     Skeleton,
+    Spinner,
     Square,
     Stack,
     Toast,
@@ -23,23 +24,25 @@ import RegisterModal from '../../../components/RegisterModal';
 import Screens from '../../screens';
 import I_NavigationParams from '../../../types/NavigationParams';
 import { AppState } from 'react-native';
-import { I_LoginResponse } from '../../../api/resources/auth';
+import { I_LinkRegister } from '../../../api/resources/auth';
 import useFetchResources from '../../../hooks/useFetchResources';
 import getLoginError from '../../../utils/getLoginError';
 import useEncryptedStorage from '../../../hooks/useEncryptedStorage';
 import E_Storage from '../../../storage/storage';
 import { useCallback } from 'react';
+import useNfcManager from '../../../hooks/useNfcManager';
 
 const Login = () => {
     const { getState, navigate } =
         useNavigation<NavigationProp<I_NavigationParams>>();
 
-    const { setItem } = useEncryptedStorage();
+    const { setItem, removeItem } = useEncryptedStorage();
 
-    const [listening] = useState(false);
+    const { readTag, readNfc, isReading } = useNfcManager();
+
     const [registerIsOpen, setRegisterIsOpen] = useState(false);
     const [stateParams, setStateParams] =
-        useState<Readonly<I_LoginResponse | undefined>>();
+        useState<Readonly<I_LinkRegister | undefined>>();
 
     const appStateChangedCallback = React.useCallback(
         (nextAppState: string) => {
@@ -57,11 +60,31 @@ const Login = () => {
     AppState.addEventListener('change', appStateChangedCallback);
 
     const {
+        data: token,
         fetchData: _login,
-        isFetching,
+        isFetching: isLoginFetching,
         isFetched: isLoginFetched,
     } = useFetchResources({
         resource: FetchResources.LOGIN,
+        method: 'POST',
+    });
+
+    const {
+        data: nfcToken,
+        fetchData: nfcLogin,
+        isFetching: isNfcLoginFetching,
+        isFetched: isNfcLoginFetched,
+    } = useFetchResources({
+        resource: FetchResources.LOGIN_NFC,
+        method: 'POST',
+    });
+
+    const {
+        fetchData: register,
+        isFetching: isRegisterFetching,
+        isFetched: isRegisterFetched,
+    } = useFetchResources({
+        resource: FetchResources.SIGNUP,
         method: 'POST',
     });
 
@@ -96,17 +119,45 @@ const Login = () => {
         });
     }, [email, password, _login]);
 
-    const {
-        fetchData: register,
-        isFetching: isRegisterFetching,
-        isFetched: isRegisterFetched,
-    } = useFetchResources({
-        resource: FetchResources.SIGNUP,
-        method: 'POST',
-    });
+    useEffect(() => {
+        removeItem({
+            key: E_Storage.TOKEN,
+        });
+    }, [removeItem]);
 
     useEffect(() => {
-        if (stateParams && (isLoginFetched || isRegisterFetched)) {
+        if (readTag?.id !== undefined) {
+            console.debug('Nfc tag read');
+            console.debug({ readTag });
+            nfcLogin({
+                nfc: readTag.id,
+            });
+        }
+    }, [nfcLogin, readTag]);
+
+    useEffect(() => {
+        if (nfcToken !== undefined) {
+            console.debug('Nfc login fetched');
+            setItem({
+                key: E_Storage.TOKEN,
+                value: nfcToken,
+                onSuccess: () => navigate(Screens.Main),
+            });
+        }
+    }, [isNfcLoginFetched, navigate, nfcToken, setItem]);
+
+    useEffect(() => {
+        if (token !== undefined) {
+            setItem({
+                key: E_Storage.TOKEN,
+                value: token,
+                onSuccess: () => navigate(Screens.Main),
+            });
+        }
+    }, [token, setItem, navigate]);
+
+    useEffect(() => {
+        if (stateParams && isRegisterFetched) {
             console.debug('Login or register fetched and link used');
             console.debug({ stateParams });
             if (stateParams.error !== undefined) {
@@ -178,7 +229,7 @@ const Login = () => {
                                     onChangeText={setPassword}
                                 />
                             </FormControl>
-                            <Skeleton isLoaded={isFetching === false}>
+                            <Skeleton isLoaded={isLoginFetching === false}>
                                 <Button
                                     colorScheme="primary"
                                     onPress={() => login()}>
@@ -193,7 +244,6 @@ const Login = () => {
                             isOpen={registerIsOpen}
                             onClose={() => {
                                 setRegisterIsOpen(false);
-                                // onLogin(true);
                             }}
                             register={register}
                             isFetching={isRegisterFetching}
@@ -204,13 +254,19 @@ const Login = () => {
                         <Heading mb="3" mx="auto">
                             ... or with your student card
                         </Heading>
-                        <Button
-                            colorScheme="primary"
-                            onPress={() => navigate(Screens.Main)}>
-                            {listening
-                                ? 'Stop listening'
-                                : 'Login with student card'}
-                        </Button>
+                        {isNfcLoginFetching ? (
+                            <Spinner>Loading</Spinner>
+                        ) : (
+                            <Button
+                                colorScheme="primary"
+                                onPress={() => {
+                                    readNfc();
+                                }}>
+                                {isReading
+                                    ? 'Stop reading'
+                                    : 'Login with student card'}
+                            </Button>
+                        )}
                     </Box>
                 </Center>
             </Box>

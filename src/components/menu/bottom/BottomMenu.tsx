@@ -22,7 +22,7 @@ const BottomMenu: T_Menu<E_MenuType.BOTTOM> = ({
         const _components = [];
         const _icons: Record<t_path['path'], t_icon['icon']> = {};
         for (const [, { component, icon, name, path }] of Object.entries(
-            parentComponents,
+            parentComponents
         )) {
             _components.push({ component, name, path });
             _icons[path] = icon;
