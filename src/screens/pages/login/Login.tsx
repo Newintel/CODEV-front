@@ -36,7 +36,7 @@ const Login = () => {
     const { getState, reset } =
         useNavigation<NavigationProp<I_NavigationParams>>();
 
-    const { setItem, removeItem } = useEncryptedStorage();
+    const { setItem, getItem, removeItem } = useEncryptedStorage();
 
     const { readTag, readNfc, isReading } = useNfcManager();
 
@@ -86,6 +86,15 @@ const Login = () => {
         method: 'POST',
     });
 
+    const {
+        fetchData: checkValidToken,
+        data: tokenIsValid,
+        isError: tokenIsInvalid,
+    } = useFetchResources({
+        resource: FetchResources.CHECK_TOKEN,
+        method: 'GET',
+    });
+
     const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
 
@@ -117,12 +126,6 @@ const Login = () => {
         });
     }, [email, password, _login]);
 
-    useEffect(() => {
-        removeItem({
-            key: E_Storage.TOKEN,
-        });
-    }, [removeItem]);
-
     const setToken = useCallback(
         (tok: string) => {
             setItem({
@@ -144,14 +147,36 @@ const Login = () => {
             nfcLogin({
                 nfc: readTag.id,
             });
+        } else {
+            getItem({
+                key: E_Storage.TOKEN,
+                onSuccess: tok => {
+                    if (tok) {
+                        checkValidToken();
+                    }
+                },
+            });
         }
-    }, [nfcLogin, readTag]);
+    }, [checkValidToken, getItem, nfcLogin, readTag]);
 
     useEffect(() => {
         if (nfcToken !== undefined) {
             setToken(nfcToken);
         }
     }, [nfcToken, setToken]);
+
+    useEffect(() => {
+        if (tokenIsValid?.valid && readTag?.id === undefined) {
+            reset({
+                index: 0,
+                routes: [{ name: Screens.Main }],
+            });
+        } else if (tokenIsInvalid) {
+            removeItem({
+                key: E_Storage.TOKEN,
+            });
+        }
+    }, [readTag?.id, removeItem, reset, tokenIsInvalid, tokenIsValid]);
 
     useEffect(() => {
         if (token !== undefined) {

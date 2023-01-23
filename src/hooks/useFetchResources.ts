@@ -33,10 +33,13 @@ const useFetchResources = <R extends FetchResources>(props: I_Props<R>) => {
             setIsFetched(false);
             const token: string = await getItem({
                 key: E_Storage.TOKEN,
-                onSuccess: value => value,
+                onSuccess: value => value && JSON.parse(value),
             });
             const headers = token
-                ? { Authorization: `Bearer ${token}` }
+                ? {
+                      Authorization: `Bearer ${token}`,
+                      'Content-Type': 'application/json',
+                  }
                 : undefined;
 
             await fetch(`${api_url}/${resource}`, {

@@ -1,4 +1,4 @@
-import { I_SignupResponse, I_AuthCheck } from './resources/auth';
+import { I_SignupResponse, I_AuthCheckResponse } from './resources/auth';
 import {
     I_LoginRequest,
     I_NFCLoginRequest as I_NfcLoginRequest,
@@ -36,8 +36,8 @@ export type ResourcesProps = {
         'POST'
     >;
     [FetchResources.CHECK_TOKEN]: FetchResourcesType<
-        I_AuthCheck,
-        string,
+        void,
+        I_AuthCheckResponse,
         'GET'
     >;
 };

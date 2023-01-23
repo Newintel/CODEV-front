@@ -23,6 +23,6 @@ export interface I_SignupResponse {
     sent_at: string;
 }
 
-export interface I_AuthCheck {
-    token: string;
+export interface I_AuthCheckResponse {
+    valid: boolean;
 }
