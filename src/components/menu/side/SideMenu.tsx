@@ -6,10 +6,13 @@ import { E_MenuType, T_Menu } from '../../../types';
  * Creates a side menu component.
  * This component should not be used directly, but rather through the SideMenuFactory function.
  */
-const SideMenu: T_Menu<E_MenuType.SIDE> = ({ components }) => {
+const SideMenu: T_Menu<E_MenuType.SIDE> = ({
+    components,
+    initialRouteName,
+}) => {
     const { Navigator, Screen } = createDrawerNavigator();
     return (
-        <Navigator initialRouteName="Menu">
+        <Navigator initialRouteName={initialRouteName}>
             {components.map(({ path, component, name }, index) => (
                 <Screen
                     name={path}

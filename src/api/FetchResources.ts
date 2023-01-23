@@ -3,6 +3,7 @@ import {
     I_LoginRequest,
     I_NFCLoginRequest as I_NfcLoginRequest,
 } from './resources/auth';
+import { I_Room } from './resources/room';
 
 /**
  * @description
@@ -16,6 +17,7 @@ export enum FetchResources {
     ADD_CARD = 'auth/nfc/id',
     LOGIN_NFC = 'auth/nfc/login',
     CHECK_TOKEN = 'auth/check',
+    EMPTY_ROOMS = 'rooms/empty',
 }
 
 export type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -52,6 +54,7 @@ export type ResourcesProps = {
         I_AuthCheckResponse,
         'GET'
     >;
+    [FetchResources.EMPTY_ROOMS]: FetchResourcesType<void, I_Room[], 'GET'>;
 };
 
 export type ResourceParams<R extends FetchResources> =
