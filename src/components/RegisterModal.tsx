@@ -107,14 +107,16 @@ const RegisterModal = (props: I_Props) => {
                         </FormControl>
                         <HStack>
                             <Skeleton
-                                isLoaded={isReading === false}
+                                isLoaded={isFetching === false}
                                 width={'75%'}>
                                 <Button
                                     colorScheme="primary"
                                     onPress={readNfc}
                                     mr="3"
                                     width={'75%'}>
-                                    Read student card
+                                    {isReading
+                                        ? 'Stop reading'
+                                        : 'Read student card'}
                                 </Button>
                             </Skeleton>
                             <Box>
