@@ -14,6 +14,13 @@ interface I_Props<R extends FetchResources> {
     method: ResourceMethods<R>;
 }
 
+/**
+ * @description
+ * This hook is used to fetch resources from the API.
+ * @param props.resource The resource to fetch.
+ * @param props.method The method to use when fetching the resource.
+ * @returns The data returned from the API.
+ */
 const useFetchResources = <R extends FetchResources>(props: I_Props<R>) => {
     const { resource, method } = props;
 

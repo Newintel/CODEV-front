@@ -4,6 +4,11 @@ import {
     I_NFCLoginRequest as I_NfcLoginRequest,
 } from './resources/auth';
 
+/**
+ * @description
+ * This enum is used to define the resources that can be fetched from the API.
+ * If you add a resource, you must add it to the {@link ResourcesProps} interface.
+ */
 export enum FetchResources {
     PING = 'ping',
     LOGIN = 'auth/login',
@@ -15,7 +20,14 @@ export enum FetchResources {
 
 export type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-interface FetchResourcesType<P, T, M extends Methods> {
+/**
+ * @description
+ * This interface is used to define the properties of a resource.
+ * @param P The type of the parameters that the resource accepts.
+ * @param T The type of the data that the resource returns.
+ * @param M The method(s) that the resource uses.
+ */
+export interface FetchResourcesType<P, T, M extends Methods> {
     params: P;
     returns: T;
     methods: M;
