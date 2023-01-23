@@ -14,12 +14,13 @@ const SideMenu: T_Menu<E_MenuType.SIDE> = ({ components }) => {
                 <Screen
                     name={path}
                     key={index}
-                    options={{ drawerLabel: name ?? path }}>
+                    options={{
+                        drawerLabel: name ?? path,
+                    }}>
                     {component}
                 </Screen>
             ))}
         </Navigator>
     );
 };
-
 export default SideMenu;

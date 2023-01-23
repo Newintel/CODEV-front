@@ -26,7 +26,7 @@ import { E_MenuType, T_Menu, T_MenuComponent } from '../../types';
 const MenuFactory =
     <T extends E_MenuType>(
         type: T,
-        routes: Record<string, T_MenuComponent<typeof type>>,
+        routes: Record<string, T_MenuComponent<typeof type>>
     ) =>
     () => {
         return (
