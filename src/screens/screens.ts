@@ -1,4 +1,4 @@
-enum Screens {
+enum E_Screens {
     Main = 'Main',
     Login = 'Login',
     Home = 'Home',
@@ -7,4 +7,4 @@ enum Screens {
     Search = 'Search',
 }
 
-export default Screens;
+export default E_Screens;

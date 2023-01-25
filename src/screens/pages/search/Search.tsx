@@ -1,8 +1,8 @@
 import React from 'react';
-import { Text } from 'react-native';
+import SearchContainer from './SearchContainer';
 
 const Search = () => {
-    return <Text>Search</Text>;
+    return <SearchContainer />;
 };
 
 export default Search;

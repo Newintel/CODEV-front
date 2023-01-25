@@ -21,7 +21,7 @@ import {
 import React, { useEffect, useState } from 'react';
 import { FetchResources } from '../../../api/FetchResources';
 import RegisterModal from '../../../components/RegisterModal';
-import Screens from '../../screens';
+import E_Screens from '../../screens';
 import I_NavigationParams from '../../../types/NavigationParams';
 import { AppState } from 'react-native';
 import { I_LinkRegister } from '../../../api/resources/auth';
@@ -49,7 +49,7 @@ const Login = () => {
             if (nextAppState === 'active') {
                 setStateParams(
                     getState().routes.find(
-                        route => route.name === Screens.Login
+                        route => route.name === E_Screens.Login
                     )?.params?.auth_message
                 );
             }
@@ -134,7 +134,7 @@ const Login = () => {
                 onSuccess: () => {
                     reset({
                         index: 0,
-                        routes: [{ name: Screens.Main }],
+                        routes: [{ name: E_Screens.Main }],
                     });
                 },
             });
@@ -169,7 +169,7 @@ const Login = () => {
         if (tokenIsValid?.valid && readTag?.id === undefined) {
             reset({
                 index: 0,
-                routes: [{ name: Screens.Main }],
+                routes: [{ name: E_Screens.Main }],
             });
         } else if (tokenIsInvalid) {
             removeItem({

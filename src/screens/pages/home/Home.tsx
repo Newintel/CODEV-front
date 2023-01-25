@@ -1,8 +1,8 @@
 import React from 'react';
-import { Text } from 'react-native';
+import HomeContainer from './HomeContainer';
 
 const Home = () => {
-    return <Text>Home</Text>;
+    return <HomeContainer />;
 };
 
 export default Home;

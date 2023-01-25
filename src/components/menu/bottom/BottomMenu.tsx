@@ -10,6 +10,7 @@ import { isString } from '../../../utils';
  */
 const BottomMenu: T_Menu<E_MenuType.BOTTOM> = ({
     components: parentComponents,
+    initialRouteName,
 }) => {
     const { Navigator, Screen } = createBottomTabNavigator();
     type t_path = Pick<typeof parentComponents[number], 'path'>;
@@ -32,7 +33,7 @@ const BottomMenu: T_Menu<E_MenuType.BOTTOM> = ({
 
     return (
         <Navigator
-            initialRouteName="Home"
+            initialRouteName={initialRouteName}
             screenOptions={({ route }) => ({
                 headerShown: false,
                 tabBarIcon: ({ focused, color, size }) => {

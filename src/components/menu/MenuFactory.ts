@@ -2,6 +2,7 @@ import SideMenu from './side/SideMenu';
 import BottomMenu from './bottom/BottomMenu';
 import MapEnum from '../../utils/MapEnum';
 import { E_MenuType, T_Menu, T_MenuComponent } from '../../types';
+import E_Screens from '../../screens/screens';
 
 /**
  * @param {E_MenuType} type - The {@link E_MenuType} type of menu to create.
@@ -19,14 +20,16 @@ import { E_MenuType, T_Menu, T_MenuComponent } from '../../types';
  *      // not required, displayed name in the menu, default is the key name (here 'page1')
  *      name: 'My component',
  *  },
- * })
+ * });
  *
  * @returns component of type {@link SideMenu} or {@link BottomMenu}, to place inside a NavigationContainer component.
+ * The {@link BottomMenu} components must contain only inline functions and/or components, because it won't be re-rendered.
  */
 const MenuFactory =
     <T extends E_MenuType>(
         type: T,
-        routes: Record<string, T_MenuComponent<typeof type>>
+        routes: Record<string, T_MenuComponent<typeof type>>,
+        initialRouteName?: E_Screens
     ) =>
     () => {
         return (
@@ -42,6 +45,7 @@ const MenuFactory =
                 path,
                 ...component,
             })),
+            initialRouteName,
         });
     };
 
