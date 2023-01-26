@@ -1,6 +1,59 @@
 import React from 'react';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import {
+    createDrawerNavigator,
+    DrawerContentComponentProps,
+    DrawerContentScrollView,
+    DrawerItem,
+    DrawerItemList,
+} from '@react-navigation/drawer';
 import { E_MenuType, T_Menu } from '../../../types';
+import { Text } from 'native-base';
+import { StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import useEncryptedStorage from '../../../hooks/useEncryptedStorage';
+import E_Storage from '../../../storage/storage';
+import E_Screens from '../../../screens/screens';
+
+const style = StyleSheet.create({
+    drawer: {
+        flex: 1,
+        justifyContent: 'space-between',
+    },
+    logout: {
+        backgroundColor: 'red',
+    },
+});
+
+const DrawerContent = (props: DrawerContentComponentProps) => {
+    const { removeItem } = useEncryptedStorage();
+    return (
+        <DrawerContentScrollView
+            {...props}
+            contentContainerStyle={style.drawer}>
+            <DrawerItemList {...props} />
+            <DrawerItem
+                style={style.logout}
+                label={() => (
+                    <Text bold color="white">
+                        Logout
+                    </Text>
+                )}
+                icon={() => <Icon name="logout" size={24} color="white" />}
+                onPress={() => {
+                    removeItem({
+                        key: E_Storage.TOKEN,
+                        onSuccess: () => {
+                            props.navigation.reset({
+                                index: 0,
+                                routes: [{ name: E_Screens.Login }],
+                            });
+                        },
+                    });
+                }}
+            />
+        </DrawerContentScrollView>
+    );
+};
 
 /**
  * Creates a side menu component.
@@ -12,7 +65,9 @@ const SideMenu: T_Menu<E_MenuType.SIDE> = ({
 }) => {
     const { Navigator, Screen } = createDrawerNavigator();
     return (
-        <Navigator initialRouteName={initialRouteName}>
+        <Navigator
+            initialRouteName={initialRouteName}
+            drawerContent={DrawerContent}>
             {components.map(({ path, component, name }, index) => (
                 <Screen
                     name={path}
