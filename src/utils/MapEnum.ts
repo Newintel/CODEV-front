@@ -8,7 +8,7 @@ const MapEnum =
     (
         mapping: Partial<T_MapEnum<T, R>> & {
             _: R;
-        },
+        }
     ) =>
     (property: T[keyof T]) =>
         mapping[property] || mapping._;
