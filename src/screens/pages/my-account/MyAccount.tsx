@@ -1,8 +1,8 @@
+import { Text } from 'native-base';
 import React from 'react';
-import MyAccountContainer from './MyAccountContainer';
 
 const MyAccount = () => {
-    return <MyAccountContainer />;
+    return <Text>MyAccount</Text>;
 };
 
 export default MyAccount;

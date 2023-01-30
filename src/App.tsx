@@ -11,23 +11,24 @@ import { NativeBaseProvider } from 'native-base';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import E_Screens from './screens/screens';
 import I_NavigationParams from './types/NavigationParams';
+import Container from './components/Container';
 
 const App = () => {
     const BottomMenu = MenuFactory(
         E_MenuType.BOTTOM,
         {
             [E_Screens.Home]: {
-                component: Home,
+                component: Container(Home),
                 icon: 'home-circle',
                 name: 'Home',
             },
             [E_Screens.Search]: {
-                component: Search,
+                component: Container(Search),
                 icon: 'magnify',
                 name: 'Search',
             },
             [E_Screens.MyAccount]: {
-                component: MyAccount,
+                component: Container(MyAccount),
                 icon: 'account-circle',
                 name: 'My Account',
             },

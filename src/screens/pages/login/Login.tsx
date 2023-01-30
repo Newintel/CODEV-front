@@ -81,6 +81,7 @@ const Login = () => {
     });
 
     const {
+        data: registerData,
         fetchData: register,
         isFetching: isRegisterFetching,
         isFetched: isRegisterFetched,
@@ -202,8 +203,8 @@ const Login = () => {
     }, [setToken, token]);
 
     useEffect(() => {
-        if (stateParams?.auth_message && isRegisterFetched) {
-            if (stateParams.auth_message?.error !== undefined) {
+        if (stateParams?.auth_message) {
+            if (stateParams.auth_message?.error) {
                 Toast.show({
                     title: 'Error',
                     description:
@@ -215,7 +216,7 @@ const Login = () => {
                 });
             }
 
-            if (stateParams.auth_message?.access_token !== undefined) {
+            if (stateParams.auth_message?.access_token) {
                 setToken(stateParams.auth_message?.access_token);
             }
         }
@@ -288,6 +289,7 @@ const Login = () => {
                             }}
                             register={register}
                             isFetching={isRegisterFetching}
+                            registerData={registerData}
                         />
                     </Box>
                     <Divider my="5" />
