@@ -24,7 +24,6 @@ import RegisterModal from '../../../components/RegisterModal';
 import E_Screens from '../../screens';
 import I_NavigationParams from '../../../types/NavigationParams';
 import { AppState } from 'react-native';
-import { I_LinkRegister } from '../../../api/resources/auth';
 import useFetchResources from '../../../hooks/useFetchResources';
 import getLoginError from '../../../utils/getLoginError';
 import useEncryptedStorage from '../../../hooks/useEncryptedStorage';
@@ -38,11 +37,11 @@ const Login = () => {
 
     const { setItem, getItem, removeItem } = useEncryptedStorage();
 
-    const { readTag, readNfc, isReading } = useNfcManager();
+    const { launchTag, readTag, readNfc, isReading } = useNfcManager();
 
     const [registerIsOpen, setRegisterIsOpen] = useState(false);
     const [stateParams, setStateParams] =
-        useState<Readonly<I_LinkRegister | undefined>>();
+        useState<Readonly<I_NavigationParams[E_Screens.Login] | undefined>>();
 
     const appStateChangedCallback = React.useCallback(
         (nextAppState: string) => {
@@ -50,12 +49,16 @@ const Login = () => {
                 setStateParams(
                     getState().routes.find(
                         route => route.name === E_Screens.Login
-                    )?.params?.auth_message
+                    )?.params
                 );
             }
         },
         [getState]
     );
+
+    useEffect(() => {
+        appStateChangedCallback(AppState.currentState);
+    }, [appStateChangedCallback]);
 
     AppState.addEventListener('change', appStateChangedCallback);
 
@@ -147,6 +150,14 @@ const Login = () => {
             nfcLogin({
                 nfc: readTag.id,
             });
+        }
+    }, [nfcLogin, readTag?.id]);
+
+    useEffect(() => {
+        if (launchTag?.id !== undefined && stateParams?.logout !== true) {
+            nfcLogin({
+                nfc: launchTag.id,
+            });
         } else {
             getItem({
                 key: E_Storage.TOKEN,
@@ -157,7 +168,13 @@ const Login = () => {
                 },
             });
         }
-    }, [checkValidToken, getItem, nfcLogin, readTag]);
+    }, [
+        checkValidToken,
+        getItem,
+        nfcLogin,
+        launchTag?.id,
+        stateParams?.logout,
+    ]);
 
     useEffect(() => {
         if (nfcToken !== undefined) {
@@ -166,7 +183,7 @@ const Login = () => {
     }, [nfcToken, setToken]);
 
     useEffect(() => {
-        if (tokenIsValid?.valid && readTag?.id === undefined) {
+        if (tokenIsValid?.valid) {
             reset({
                 index: 0,
                 routes: [{ name: E_Screens.Main }],
@@ -185,22 +202,24 @@ const Login = () => {
     }, [setToken, token]);
 
     useEffect(() => {
-        if (stateParams && isRegisterFetched) {
-            if (stateParams.error !== undefined) {
+        if (stateParams?.auth_message && isRegisterFetched) {
+            if (stateParams.auth_message?.error !== undefined) {
                 Toast.show({
                     title: 'Error',
                     description:
-                        getLoginError(stateParams.error_code) ??
-                        stateParams.error_description?.split('+').join(' '),
+                        getLoginError(stateParams.auth_message?.error_code) ??
+                        stateParams.auth_message?.error_description
+                            ?.split('+')
+                            .join(' '),
                     duration: 5000,
                 });
             }
 
-            if (stateParams.access_token !== undefined) {
-                setToken(stateParams.access_token);
+            if (stateParams.auth_message?.access_token !== undefined) {
+                setToken(stateParams.auth_message?.access_token);
             }
         }
-    }, [isRegisterFetched, setToken, stateParams]);
+    }, [isRegisterFetched, setToken, stateParams?.auth_message]);
 
     return (
         <View flex={1} backgroundColor={'blue.100'}>

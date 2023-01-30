@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     createDrawerNavigator,
     DrawerContentComponentProps,
@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import useEncryptedStorage from '../../../hooks/useEncryptedStorage';
 import E_Storage from '../../../storage/storage';
 import E_Screens from '../../../screens/screens';
+import { useEffect } from 'react';
 
 const style = StyleSheet.create({
     drawer: {
@@ -22,35 +23,63 @@ const style = StyleSheet.create({
     logout: {
         backgroundColor: 'red',
     },
+    login: {
+        backgroundColor: 'blue',
+    },
 });
 
-const DrawerContent = (props: DrawerContentComponentProps) => {
+const DrawerContent = (
+    props: DrawerContentComponentProps & { hasToken: boolean }
+) => {
     const { removeItem } = useEncryptedStorage();
     return (
         <DrawerContentScrollView
             {...props}
             contentContainerStyle={style.drawer}>
             <DrawerItemList {...props} />
-            <DrawerItem
-                style={style.logout}
-                label={() => (
-                    <Text bold color="white">
-                        Logout
-                    </Text>
-                )}
-                icon={() => <Icon name="logout" size={24} color="white" />}
-                onPress={() => {
-                    removeItem({
-                        key: E_Storage.TOKEN,
-                        onSuccess: () => {
-                            props.navigation.reset({
-                                index: 0,
-                                routes: [{ name: E_Screens.Login }],
-                            });
-                        },
-                    });
-                }}
-            />
+            {props.hasToken ? (
+                <DrawerItem
+                    style={style.logout}
+                    label={() => (
+                        <Text bold color="white">
+                            Logout
+                        </Text>
+                    )}
+                    icon={() => <Icon name="logout" size={24} color="white" />}
+                    onPress={() => {
+                        removeItem({
+                            key: E_Storage.TOKEN,
+                            onSuccess: () => {
+                                props.navigation.reset({
+                                    index: 0,
+                                    routes: [
+                                        {
+                                            name: E_Screens.Login,
+                                            params: { logout: true },
+                                        },
+                                    ],
+                                });
+                            },
+                        });
+                    }}
+                />
+            ) : (
+                <DrawerItem
+                    style={style.login}
+                    label={() => (
+                        <Text bold color="white">
+                            Login
+                        </Text>
+                    )}
+                    icon={() => <Icon name="login" size={24} color="white" />}
+                    onPress={() => {
+                        props.navigation.reset({
+                            index: 0,
+                            routes: [{ name: E_Screens.Login }],
+                        });
+                    }}
+                />
+            )}
         </DrawerContentScrollView>
     );
 };
@@ -64,10 +93,23 @@ const SideMenu: T_Menu<E_MenuType.SIDE> = ({
     initialRouteName,
 }) => {
     const { Navigator, Screen } = createDrawerNavigator();
+    const { getItem } = useEncryptedStorage();
+
+    const [token, setToken] = useState<string>();
+
+    useEffect(() => {
+        getItem({
+            key: E_Storage.TOKEN,
+            onSuccess: tok => setToken(tok ?? undefined),
+        });
+    }, [getItem]);
+
     return (
         <Navigator
             initialRouteName={initialRouteName}
-            drawerContent={DrawerContent}>
+            drawerContent={props =>
+                DrawerContent({ ...props, hasToken: token !== undefined })
+            }>
             {components.map(({ path, component, name }, index) => (
                 <Screen
                     name={path}

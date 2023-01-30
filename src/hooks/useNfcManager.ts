@@ -3,6 +3,7 @@ import nfcManager, { NfcTech, TagEvent } from 'react-native-nfc-manager';
 
 const useNfcManager = () => {
     const [readTag, setReadTag] = useState<TagEvent | null>(null);
+    const [launchTag, setLaunchTag] = useState<TagEvent | null>(null);
     const [isReading, setIsReading] = useState(false);
     const [nfcStarted, setNfcStarted] = useState(false);
 
@@ -19,7 +20,7 @@ const useNfcManager = () => {
     useEffect(() => {
         nfcManager.getLaunchTagEvent().then(tag => {
             if (tag) {
-                setReadTag(tag);
+                setLaunchTag(tag);
             }
         });
     }, []);
@@ -31,6 +32,7 @@ const useNfcManager = () => {
     }, []);
 
     const readNfc = useCallback(async () => {
+        setReadTag(null);
         if (isReading) {
             await stopReading();
             return;
@@ -50,6 +52,7 @@ const useNfcManager = () => {
     }, [checkNfc, isReading, nfcStarted, stopReading]);
 
     return {
+        launchTag,
         readTag,
         isReading,
         readNfc,

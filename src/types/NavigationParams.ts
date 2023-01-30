@@ -1,7 +1,7 @@
 import { I_LinkRegister } from '../api/resources/auth';
 import E_Screens from '../screens/screens';
 interface I_NavigationParams {
-    [E_Screens.Login]: { auth_message: I_LinkRegister };
+    [E_Screens.Login]: { auth_message?: I_LinkRegister; logout?: boolean };
     [E_Screens.Home]: undefined;
     [E_Screens.Menu]: undefined;
     [E_Screens.MyAccount]: undefined;
