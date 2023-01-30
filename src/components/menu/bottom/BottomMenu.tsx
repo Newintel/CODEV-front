@@ -13,11 +13,12 @@ const BottomMenu: T_Menu<E_MenuType.BOTTOM> = ({
     initialRouteName,
 }) => {
     const { Navigator, Screen } = createBottomTabNavigator();
-    type t_path = Pick<typeof parentComponents[number], 'path'>;
-    type t_icon = Pick<typeof parentComponents[number], 'icon'>;
+    type t_parent = (typeof parentComponents)[number];
+    type t_path = Pick<t_parent, 'path'>;
+    type t_icon = Pick<t_parent, 'icon'>;
 
     const { components, icons } = React.useMemo<{
-        components: Omit<typeof parentComponents[number], 'icon'>[];
+        components: Omit<t_parent, 'icon'>[];
         icons: Record<t_path['path'], t_icon['icon']>;
     }>(() => {
         const _components = [];
