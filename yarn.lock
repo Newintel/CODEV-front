@@ -6569,7 +6569,7 @@ __metadata:
     react-native-encrypted-storage: ^4.0.3
     react-native-gesture-handler: ^2.7.1
     react-native-nfc-manager: ^3.14.0
-    react-native-reanimated: ^2.11.0
+    react-native-reanimated: ^2.14.4
     react-native-safe-area-context: 3.3.2
     react-native-screens: ^3.18.2
     react-native-svg: 12.1.1
@@ -10854,7 +10854,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:^2.11.0":
+"react-native-reanimated@npm:^2.14.4":
   version: 2.14.4
   resolution: "react-native-reanimated@npm:2.14.4"
   dependencies:
