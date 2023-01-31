@@ -311,6 +311,20 @@ const Login = () => {
                             </Button>
                         )}
                     </Box>
+                    <Divider my="5" />
+                    <Heading mb="3" mx="auto">
+                        Or continue as a guest
+                    </Heading>
+                    <Button
+                        colorScheme="primary"
+                        onPress={() => {
+                            reset({
+                                index: 0,
+                                routes: [{ name: E_Screens.Main }],
+                            });
+                        }}>
+                        Continue as a guest
+                    </Button>
                 </Center>
             </Box>
         </View>
