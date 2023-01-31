@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     createDrawerNavigator,
     DrawerContentComponentProps,
@@ -13,7 +13,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import useEncryptedStorage from '../../../hooks/useEncryptedStorage';
 import E_Storage from '../../../storage/storage';
 import E_Screens from '../../../screens/screens';
-import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import AuthSelectors from '../../../storage/redux/selectors/auth';
+import AuthActions from '../../../storage/redux/actions/auth';
 
 const style = StyleSheet.create({
     drawer: {
@@ -29,15 +31,16 @@ const style = StyleSheet.create({
 });
 
 const DrawerContent = (
-    props: DrawerContentComponentProps & { hasToken: boolean }
+    props: DrawerContentComponentProps & { logged: boolean }
 ) => {
     const { removeItem } = useEncryptedStorage();
+    const dispatch = useDispatch();
     return (
         <DrawerContentScrollView
             {...props}
             contentContainerStyle={style.drawer}>
             <DrawerItemList {...props} />
-            {props.hasToken ? (
+            {props.logged ? (
                 <DrawerItem
                     style={style.logout}
                     label={() => (
@@ -50,12 +53,12 @@ const DrawerContent = (
                         removeItem({
                             key: E_Storage.TOKEN,
                             onSuccess: () => {
+                                dispatch(AuthActions.logout());
                                 props.navigation.reset({
                                     index: 0,
                                     routes: [
                                         {
-                                            name: E_Screens.Login,
-                                            params: { logout: true },
+                                            name: E_Screens.Main,
                                         },
                                     ],
                                 });
@@ -93,23 +96,12 @@ const SideMenu: T_Menu<E_MenuType.SIDE> = ({
     initialRouteName,
 }) => {
     const { Navigator, Screen } = createDrawerNavigator();
-    const { getItem } = useEncryptedStorage();
-
-    const [token, setToken] = useState<string>();
-
-    useEffect(() => {
-        getItem({
-            key: E_Storage.TOKEN,
-            onSuccess: tok => setToken(tok ?? undefined),
-        });
-    }, [getItem]);
+    const logged = useSelector(AuthSelectors.logged);
 
     return (
         <Navigator
             initialRouteName={initialRouteName}
-            drawerContent={props =>
-                DrawerContent({ ...props, hasToken: token !== undefined })
-            }>
+            drawerContent={props => DrawerContent({ ...props, logged })}>
             {components.map(({ path, component, name }, index) => (
                 <Screen
                     name={path}

@@ -12,23 +12,28 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import E_Screens from './screens/screens';
 import I_NavigationParams from './types/NavigationParams';
 import Container from './components/Container';
+import { Provider } from 'react-redux';
+import store from './storage/redux/store';
 
 const App = () => {
     const BottomMenu = MenuFactory(
         E_MenuType.BOTTOM,
         {
             [E_Screens.Home]: {
-                component: Container(Home),
+                component: Container({ Component: Home }),
                 icon: 'home-circle',
                 name: 'Home',
             },
             [E_Screens.Search]: {
-                component: Container(Search),
+                component: Container({ Component: Search, mustBeLogged: true }),
                 icon: 'magnify',
                 name: 'Search',
             },
             [E_Screens.MyAccount]: {
-                component: Container(MyAccount),
+                component: Container({
+                    Component: MyAccount,
+                    mustBeLogged: true,
+                }),
                 icon: 'account-circle',
                 name: 'My Account',
             },
@@ -43,49 +48,51 @@ const App = () => {
     const { Navigator, Screen } = createNativeStackNavigator();
 
     return (
-        <NativeBaseProvider>
-            <NavigationContainer<I_NavigationParams>
-                linking={{
-                    prefixes: ['com.front://'],
-                    config: {
-                        screens: {
-                            [E_Screens.Login]: {
-                                path: 'login/:auth_message',
-                                parse: {
-                                    auth_message: auth_message => {
-                                        const fields = auth_message
-                                            .slice(1)
-                                            .split('&')
-                                            .map(field => {
-                                                const [key, value] =
-                                                    field.split('=');
-                                                return { [key]: value };
-                                            })
-                                            .reduce((acc, cur) => {
-                                                return { ...acc, ...cur };
-                                            });
+        <Provider store={store}>
+            <NativeBaseProvider>
+                <NavigationContainer<I_NavigationParams>
+                    linking={{
+                        prefixes: ['com.front://'],
+                        config: {
+                            screens: {
+                                [E_Screens.Login]: {
+                                    path: 'login/:auth_message',
+                                    parse: {
+                                        auth_message: auth_message => {
+                                            const fields = auth_message
+                                                .slice(1)
+                                                .split('&')
+                                                .map(field => {
+                                                    const [key, value] =
+                                                        field.split('=');
+                                                    return { [key]: value };
+                                                })
+                                                .reduce((acc, cur) => {
+                                                    return { ...acc, ...cur };
+                                                });
 
-                                        return fields;
+                                            return fields;
+                                        },
                                     },
                                 },
                             },
                         },
-                    },
-                }}>
-                <Navigator initialRouteName={E_Screens.Main}>
-                    <Screen
-                        name={E_Screens.Login}
-                        component={Login}
-                        options={{ headerShown: false }}
-                    />
-                    <Screen
-                        name={E_Screens.Main}
-                        component={SideMenu}
-                        options={{ headerShown: false }}
-                    />
-                </Navigator>
-            </NavigationContainer>
-        </NativeBaseProvider>
+                    }}>
+                    <Navigator initialRouteName={E_Screens.Main}>
+                        <Screen
+                            name={E_Screens.Login}
+                            component={Login}
+                            options={{ headerShown: false }}
+                        />
+                        <Screen
+                            name={E_Screens.Main}
+                            component={SideMenu}
+                            options={{ headerShown: false }}
+                        />
+                    </Navigator>
+                </NavigationContainer>
+            </NativeBaseProvider>
+        </Provider>
     );
 };
 
