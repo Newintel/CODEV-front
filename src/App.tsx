@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 
 import MenuFactory from './components/menu/MenuFactory';
@@ -14,6 +14,10 @@ import I_NavigationParams from './types/NavigationParams';
 import Container from './components/Container';
 import { Provider } from 'react-redux';
 import store from './storage/redux/store';
+import useNfcManager from './hooks/useNfcManager';
+import { useEffect } from 'react';
+import useEncryptedStorage from './hooks/useEncryptedStorage';
+import E_Storage from './storage/storage';
 
 const App = () => {
     const BottomMenu = MenuFactory(
@@ -47,6 +51,25 @@ const App = () => {
 
     const { Navigator, Screen } = createNativeStackNavigator();
 
+    const { launchTag } = useNfcManager();
+    const { removeItem, getItem } = useEncryptedStorage();
+
+    const [goToLogin, setGoToLogin] = useState(false);
+
+    useEffect(() => {
+        if (launchTag) {
+            removeItem({
+                key: E_Storage.TOKEN,
+                onSuccess: () => setGoToLogin(true),
+            });
+        } else {
+            getItem({
+                key: E_Storage.TOKEN,
+                onSuccess: () => setGoToLogin(true),
+            });
+        }
+    });
+
     return (
         <Provider store={store}>
             <NativeBaseProvider>
@@ -78,7 +101,10 @@ const App = () => {
                             },
                         },
                     }}>
-                    <Navigator initialRouteName={E_Screens.Main}>
+                    <Navigator
+                        initialRouteName={
+                            goToLogin ? E_Screens.Login : E_Screens.Main
+                        }>
                         <Screen
                             name={E_Screens.Login}
                             component={Login}
