@@ -1,4 +1,3 @@
-import { NavigationProp, useNavigation } from '@react-navigation/native';
 import {
     Box,
     Button,
@@ -22,23 +21,30 @@ import React, { useEffect, useState } from 'react';
 import { FetchResources } from '../../../api/FetchResources';
 import RegisterModal from '../../../components/RegisterModal';
 import E_Screens from '../../screens';
-import I_NavigationParams from '../../../types/NavigationParams';
 import { AppState } from 'react-native';
-import { I_LinkRegister } from '../../../api/resources/auth';
 import useFetchResources from '../../../hooks/useFetchResources';
 import getLoginError from '../../../utils/getLoginError';
 import useEncryptedStorage from '../../../hooks/useEncryptedStorage';
 import E_Storage from '../../../storage/storage';
 import { useCallback } from 'react';
 import useNfcManager from '../../../hooks/useNfcManager';
+import useAppNavigation from '../../../hooks/useAppNavigation';
+import { useDispatch, useSelector } from 'react-redux';
+import AuthActions from '../../../storage/redux/actions/auth';
+import AuthSelectors from '../../../storage/redux/selectors/auth';
+import { I_LinkRegister } from '../../../api/resources/auth';
 
 const Login = () => {
-    const { getState, reset } =
-        useNavigation<NavigationProp<I_NavigationParams>>();
+    const { getState, reset } = useAppNavigation();
 
     const { setItem, getItem, removeItem } = useEncryptedStorage();
 
-    const { readTag, readNfc, isReading } = useNfcManager();
+    const { launchTag, readTag, readNfc, isReading } = useNfcManager();
+
+    const dispatch = useDispatch();
+
+    const hasLoggedOut = useSelector(AuthSelectors.hasLoggedOut);
+    const isLogged = useSelector(AuthSelectors.logged);
 
     const [registerIsOpen, setRegisterIsOpen] = useState(false);
     const [stateParams, setStateParams] =
@@ -56,6 +62,10 @@ const Login = () => {
         },
         [getState]
     );
+
+    useEffect(() => {
+        appStateChangedCallback(AppState.currentState);
+    }, [appStateChangedCallback]);
 
     AppState.addEventListener('change', appStateChangedCallback);
 
@@ -78,6 +88,7 @@ const Login = () => {
     });
 
     const {
+        data: registerData,
         fetchData: register,
         isFetching: isRegisterFetching,
         isFetched: isRegisterFetched,
@@ -131,21 +142,33 @@ const Login = () => {
             setItem({
                 key: E_Storage.TOKEN,
                 value: tok,
-                onSuccess: () => {
-                    reset({
-                        index: 0,
-                        routes: [{ name: E_Screens.Main }],
-                    });
-                },
+                onSuccess: () => dispatch(AuthActions.login()),
             });
         },
-        [setItem, reset]
+        [setItem, dispatch]
     );
+
+    useEffect(() => {
+        if (isLogged) {
+            reset({
+                index: 0,
+                routes: [{ name: E_Screens.Main }],
+            });
+        }
+    }, [isLogged, reset]);
 
     useEffect(() => {
         if (readTag?.id !== undefined) {
             nfcLogin({
                 nfc: readTag.id,
+            });
+        }
+    }, [nfcLogin, readTag?.id]);
+
+    useEffect(() => {
+        if (launchTag?.id !== undefined && hasLoggedOut === false) {
+            nfcLogin({
+                nfc: launchTag.id,
             });
         } else {
             getItem({
@@ -157,7 +180,7 @@ const Login = () => {
                 },
             });
         }
-    }, [checkValidToken, getItem, nfcLogin, readTag]);
+    }, [checkValidToken, getItem, nfcLogin, launchTag?.id, hasLoggedOut]);
 
     useEffect(() => {
         if (nfcToken !== undefined) {
@@ -166,17 +189,14 @@ const Login = () => {
     }, [nfcToken, setToken]);
 
     useEffect(() => {
-        if (tokenIsValid?.valid && readTag?.id === undefined) {
-            reset({
-                index: 0,
-                routes: [{ name: E_Screens.Main }],
-            });
+        if (tokenIsValid?.valid) {
+            dispatch(AuthActions.login());
         } else if (tokenIsInvalid) {
             removeItem({
                 key: E_Storage.TOKEN,
             });
         }
-    }, [readTag?.id, removeItem, reset, tokenIsInvalid, tokenIsValid]);
+    }, [dispatch, removeItem, tokenIsInvalid, tokenIsValid?.valid]);
 
     useEffect(() => {
         if (token !== undefined) {
@@ -185,8 +205,8 @@ const Login = () => {
     }, [setToken, token]);
 
     useEffect(() => {
-        if (stateParams && isRegisterFetched) {
-            if (stateParams.error !== undefined) {
+        if (stateParams) {
+            if (stateParams.error) {
                 Toast.show({
                     title: 'Error',
                     description:
@@ -196,7 +216,7 @@ const Login = () => {
                 });
             }
 
-            if (stateParams.access_token !== undefined) {
+            if (stateParams.access_token) {
                 setToken(stateParams.access_token);
             }
         }
@@ -269,6 +289,7 @@ const Login = () => {
                             }}
                             register={register}
                             isFetching={isRegisterFetching}
+                            registerData={registerData}
                         />
                     </Box>
                     <Divider my="5" />
@@ -290,6 +311,20 @@ const Login = () => {
                             </Button>
                         )}
                     </Box>
+                    <Divider my="5" />
+                    <Heading mb="3" mx="auto">
+                        Or continue as a guest
+                    </Heading>
+                    <Button
+                        colorScheme="primary"
+                        onPress={() => {
+                            reset({
+                                index: 0,
+                                routes: [{ name: E_Screens.Main }],
+                            });
+                        }}>
+                        Continue as a guest
+                    </Button>
                 </Center>
             </Box>
         </View>

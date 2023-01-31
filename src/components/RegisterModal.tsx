@@ -13,19 +13,25 @@ import {
     VStack,
 } from 'native-base';
 import React, { useCallback } from 'react';
-import { FetchResources, FetchResourcesCallback } from '../api/FetchResources';
+import {
+    FetchResources,
+    FetchResourcesCallback,
+    ResourceReturns,
+} from '../api/FetchResources';
 import useNfcManager from '../hooks/useNfcManager';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useEffect } from 'react';
 
 interface I_Props {
     onClose?: () => void;
     isOpen: boolean;
     isFetching: boolean;
     register: FetchResourcesCallback<FetchResources.SIGNUP>;
+    registerData: ResourceReturns<FetchResources.SIGNUP> | undefined;
 }
 
 const RegisterModal = (props: I_Props) => {
-    const { onClose, isOpen, register, isFetching } = props;
+    const { onClose, isOpen, register, isFetching, registerData } = props;
 
     const { readTag, readNfc, isReading } = useNfcManager();
 
@@ -60,6 +66,15 @@ const RegisterModal = (props: I_Props) => {
             nfc: readTag?.id,
         });
     }, [email, password, register, readTag]);
+
+    useEffect(() => {
+        if (registerData) {
+            Toast.show({
+                title: `Signup complete. An link was sent to ${registerData?.email}.`,
+                duration: 5000,
+            });
+        }
+    }, [registerData]);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
