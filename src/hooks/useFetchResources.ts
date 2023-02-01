@@ -1,9 +1,11 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import useConfig from './useConfig';
 import {
     ResourceReturns,
     ResourceParams,
     FetchResourcesCallback,
+    ResourceUrlParams,
+    ResourceHasUrlParams,
 } from '../api/FetchResources';
 import { FetchResources, ResourceMethods } from '../api/FetchResources';
 import useEncryptedStorage from './useEncryptedStorage';
@@ -12,7 +14,14 @@ import E_Storage from '../storage/storage';
 interface I_Props<R extends FetchResources> {
     resource: R;
     method: ResourceMethods<R>;
+    resource_params: ResourceHasUrlParams<R> extends true
+        ? ResourceUrlParams<R>
+        : never;
 }
+
+type T_Props<R extends FetchResources> = ResourceHasUrlParams<R> extends true
+    ? Required<I_Props<R>>
+    : Omit<I_Props<R>, 'resource_params'>;
 
 /**
  * @description
@@ -21,8 +30,12 @@ interface I_Props<R extends FetchResources> {
  * @param props.method The method to use when fetching the resource.
  * @returns The data returned from the API.
  */
-const useFetchResources = <R extends FetchResources>(props: I_Props<R>) => {
-    const { resource, method } = props;
+const useFetchResources = <R extends FetchResources>(props: T_Props<R>) => {
+    const {
+        resource,
+        method,
+        resource_params = undefined,
+    } = props as I_Props<R>;
 
     const [data, setData] = useState<ResourceReturns<R>>();
     const [isFetching, setIsFetching] = useState(false);
@@ -32,6 +45,23 @@ const useFetchResources = <R extends FetchResources>(props: I_Props<R>) => {
     const { api_url } = useConfig();
 
     const { getItem } = useEncryptedStorage();
+
+    const resource_url = useMemo(() => {
+        let _resource = resource.toString();
+        const params = resource.match(/:\w+/g);
+        if (params) {
+            for (const param of params) {
+                const name = param.slice(1) as keyof typeof resource_params;
+                if (resource_params?.[name]) {
+                    _resource = _resource.replace(
+                        param,
+                        `${resource_params[name]}`
+                    );
+                }
+            }
+        }
+        return _resource;
+    }, [resource, resource_params]);
 
     const fetchData = useCallback<FetchResourcesCallback<R>>(
         async (body?: ResourceParams<R>) => {
@@ -49,7 +79,7 @@ const useFetchResources = <R extends FetchResources>(props: I_Props<R>) => {
                   }
                 : undefined;
 
-            await fetch(`${api_url}/${resource}`, {
+            await fetch(`${api_url}/${resource_url}`, {
                 method,
                 body: JSON.stringify(body),
                 headers,
@@ -71,7 +101,7 @@ const useFetchResources = <R extends FetchResources>(props: I_Props<R>) => {
                     setIsFetching(false);
                 });
         },
-        [api_url, getItem, method, resource]
+        [api_url, getItem, method, resource_url]
     );
 
     return { data, isFetching, fetchData, isFetched, isError };
