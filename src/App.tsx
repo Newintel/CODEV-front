@@ -18,6 +18,8 @@ import useNfcManager from './hooks/useNfcManager';
 import { useEffect } from 'react';
 import useEncryptedStorage from './hooks/useEncryptedStorage';
 import E_Storage from './storage/storage';
+import Friends from './screens/pages/friends/Friends';
+import FriendRequests from './screens/pages/friends/FriendRequests';
 
 const App = () => {
     const BottomMenu = MenuFactory(
@@ -26,12 +28,10 @@ const App = () => {
             [E_Screens.Home]: {
                 component: Container({ Component: Home }),
                 icon: 'home-circle',
-                name: 'Home',
             },
             [E_Screens.Search]: {
                 component: Container({ Component: Search, mustBeLogged: true }),
                 icon: 'magnify',
-                name: 'Search',
             },
             [E_Screens.MyAccount]: {
                 component: Container({
@@ -45,9 +45,39 @@ const App = () => {
         E_Screens.Home
     );
 
-    const SideMenu = MenuFactory(E_MenuType.SIDE, {
-        [E_Screens.Menu]: { component: BottomMenu, name: 'Menu' },
-    });
+    const FriendsBottomMenu = MenuFactory(
+        E_MenuType.BOTTOM,
+        {
+            [E_Screens.Friends]: {
+                component: Container({
+                    Component: Friends,
+                    mustBeLogged: true,
+                }),
+                icon: 'account-group',
+            },
+            [E_Screens.FriendRequests]: {
+                component: Container({
+                    Component: FriendRequests,
+                    mustBeLogged: true,
+                }),
+                name: 'Friend Requests',
+                icon: 'account-plus',
+            },
+        },
+        E_Screens.Friends
+    );
+
+    const SideMenu = MenuFactory(
+        E_MenuType.SIDE,
+        {
+            [E_Screens.Menu]: { component: BottomMenu },
+            [E_Screens.FriendsMenu]: {
+                component: FriendsBottomMenu,
+                name: 'Friends',
+            },
+        },
+        E_Screens.Menu
+    );
 
     const { Navigator, Screen } = createNativeStackNavigator();
 

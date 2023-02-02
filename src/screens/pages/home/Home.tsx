@@ -1,13 +1,14 @@
 import { ScrollView, Spinner, Text } from 'native-base';
 import React, { useEffect } from 'react';
 import { RefreshControl } from 'react-native';
-import { FetchResources } from '../../../api/FetchResources';
+import { FetchResources, Methods } from '../../../api/FetchResources';
 import RoomCard from '../../../components/RoomCard';
 import useFetchResources from '../../../hooks/useFetchResources';
+
 const Home = () => {
     const { data, isFetching, fetchData } = useFetchResources({
         resource: FetchResources.EMPTY_ROOMS,
-        method: 'GET',
+        method: Methods.GET,
     });
 
     useEffect(() => {

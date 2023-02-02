@@ -11,17 +11,20 @@ import { FetchResources, ResourceMethods } from '../api/FetchResources';
 import useEncryptedStorage from './useEncryptedStorage';
 import E_Storage from '../storage/storage';
 
-interface I_Props<R extends FetchResources> {
+interface I_Props<R extends FetchResources, M extends ResourceMethods<R>> {
     resource: R;
-    method: ResourceMethods<R>;
-    resource_params: ResourceHasUrlParams<R> extends true
-        ? ResourceUrlParams<R>
+    method: M;
+    resource_params: ResourceHasUrlParams<R, M> extends true
+        ? ResourceUrlParams<R, M>
         : never;
 }
 
-type T_Props<R extends FetchResources> = ResourceHasUrlParams<R> extends true
-    ? Required<I_Props<R>>
-    : Omit<I_Props<R>, 'resource_params'>;
+type T_Props<
+    R extends FetchResources,
+    M extends ResourceMethods<R>
+> = ResourceHasUrlParams<R, M> extends true
+    ? Required<I_Props<R, M>>
+    : Omit<I_Props<R, M>, 'resource_params'>;
 
 /**
  * @description
@@ -30,14 +33,19 @@ type T_Props<R extends FetchResources> = ResourceHasUrlParams<R> extends true
  * @param props.method The method to use when fetching the resource.
  * @returns The data returned from the API.
  */
-const useFetchResources = <R extends FetchResources>(props: T_Props<R>) => {
+const useFetchResources = <
+    R extends FetchResources,
+    M extends ResourceMethods<R>
+>(
+    props: T_Props<R, M>
+) => {
     const {
         resource,
         method,
         resource_params = undefined,
-    } = props as I_Props<R>;
+    } = props as I_Props<R, M>;
 
-    const [data, setData] = useState<ResourceReturns<R>>();
+    const [data, setData] = useState<ResourceReturns<R, M>>();
     const [isFetching, setIsFetching] = useState(false);
     const [isFetched, setIsFetched] = useState(false);
     const [isError, setIsError] = useState(false);
@@ -63,8 +71,8 @@ const useFetchResources = <R extends FetchResources>(props: T_Props<R>) => {
         return _resource;
     }, [resource, resource_params]);
 
-    const fetchData = useCallback<FetchResourcesCallback<R>>(
-        async (body?: ResourceParams<R>) => {
+    const fetchData = useCallback<FetchResourcesCallback<R, M>>(
+        async (body?: ResourceParams<R, M>) => {
             setIsFetching(true);
             setIsError(false);
             setIsFetched(false);
@@ -80,7 +88,7 @@ const useFetchResources = <R extends FetchResources>(props: T_Props<R>) => {
                 : undefined;
 
             await fetch(`${api_url}/${resource_url}`, {
-                method,
+                method: method.toString(),
                 body: JSON.stringify(body),
                 headers,
             })

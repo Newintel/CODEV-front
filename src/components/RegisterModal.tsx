@@ -21,13 +21,16 @@ import {
 import useNfcManager from '../hooks/useNfcManager';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useEffect } from 'react';
+import { Methods } from '../api/FetchResources';
 
 interface I_Props {
     onClose?: () => void;
     isOpen: boolean;
     isFetching: boolean;
-    register: FetchResourcesCallback<FetchResources.SIGNUP>;
-    registerData: ResourceReturns<FetchResources.SIGNUP> | undefined;
+    register: FetchResourcesCallback<FetchResources.SIGNUP, Methods.POST>;
+    registerData:
+        | ResourceReturns<FetchResources.SIGNUP, Methods.POST>
+        | undefined;
 }
 
 const RegisterModal = (props: I_Props) => {

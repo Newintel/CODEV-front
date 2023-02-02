@@ -5,6 +5,9 @@ enum E_Screens {
     Menu = 'Menu',
     MyAccount = 'MyAccount',
     Search = 'Search',
+    FriendsMenu = 'FriendsMenu',
+    Friends = 'Friends',
+    FriendRequests = 'FriendRequests',
 }
 
 export default E_Screens;

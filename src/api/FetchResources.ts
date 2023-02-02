@@ -4,7 +4,8 @@ import {
     I_NFCLoginRequest as I_NfcLoginRequest,
 } from './resources/auth';
 import { I_Room } from './resources/room';
-import { I_User } from './resources/user';
+import { I_ModifyUser, I_User } from './resources/user';
+import { I_FriendRequestParams } from './resources/friend';
 
 /**
  * @description
@@ -21,10 +22,18 @@ export enum FetchResources {
     EMPTY_ROOMS = 'rooms/empty',
     GET_USER = 'users/me',
     GET_USER_BY_ID = 'users/:id',
-    GET_USERS = 'users',
+    USERS = 'users',
+    FRIENDS = 'friends',
+    FRIENDS_REQUESTS = 'friends/requests',
+    FRIENDS_REQUESTS_SENT = 'friends/requests/sent',
 }
 
-export type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export enum Methods {
+    GET = 'GET',
+    POST = 'POST',
+    PUT = 'PUT',
+    DELETE = 'DELETE',
+}
 
 /**
  * @description
@@ -33,73 +42,91 @@ export type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
  * @param T The type of the data that the resource returns.
  * @param M The method(s) that the resource uses.
  */
-export interface FetchResourcesType<U, P, T, M extends Methods> {
+export interface FetchResourcesType<U = void, P = void, R = void> {
     url: U;
     params: P;
-    returns: T;
-    methods: M;
+    returns: R;
 }
 
 export type ResourcesProps = {
-    [FetchResources.PING]: FetchResourcesType<void, void, string, 'GET'>;
-    [FetchResources.LOGIN]: FetchResourcesType<
-        void,
-        I_LoginRequest,
-        string,
-        'POST'
-    >;
-    [FetchResources.SIGNUP]: FetchResourcesType<
-        void,
-        I_LoginRequest & Partial<I_NfcLoginRequest>,
-        I_SignupResponse,
-        'POST'
-    >;
-    [FetchResources.ADD_CARD]: FetchResourcesType<
-        void,
-        undefined,
-        undefined,
-        'PUT'
-    >;
-    [FetchResources.LOGIN_NFC]: FetchResourcesType<
-        void,
-        I_NfcLoginRequest,
-        string,
-        'POST'
-    >;
-    [FetchResources.CHECK_TOKEN]: FetchResourcesType<
-        void,
-        void,
-        I_AuthCheckResponse,
-        'GET'
-    >;
-    [FetchResources.EMPTY_ROOMS]: FetchResourcesType<
-        void,
-        void,
-        I_Room[],
-        'GET'
-    >;
-    [FetchResources.GET_USER]: FetchResourcesType<void, void, I_User, 'GET'>;
-    [FetchResources.GET_USER_BY_ID]: FetchResourcesType<
-        { id: string },
-        void,
-        I_User,
-        'GET'
-    >;
-    [FetchResources.GET_USERS]: FetchResourcesType<void, void, I_User[], 'GET'>;
+    [FetchResources.PING]: {
+        [Methods.GET]: FetchResourcesType<void, void, string>;
+    };
+    [FetchResources.LOGIN]: {
+        [Methods.POST]: FetchResourcesType<void, I_LoginRequest, string>;
+    };
+    [FetchResources.SIGNUP]: {
+        [Methods.POST]: FetchResourcesType<
+            void,
+            I_LoginRequest & Partial<I_NfcLoginRequest>,
+            I_SignupResponse
+        >;
+    };
+    [FetchResources.ADD_CARD]: {
+        [Methods.PUT]: FetchResourcesType<void, I_NfcLoginRequest, undefined>;
+    };
+    [FetchResources.LOGIN_NFC]: {
+        [Methods.POST]: FetchResourcesType<void, I_NfcLoginRequest, string>;
+    };
+    [FetchResources.CHECK_TOKEN]: {
+        [Methods.GET]: FetchResourcesType<void, void, I_AuthCheckResponse>;
+    };
+    [FetchResources.EMPTY_ROOMS]: {
+        [Methods.GET]: FetchResourcesType<void, void, I_Room[]>;
+    };
+    [FetchResources.GET_USER]: {
+        [Methods.GET]: FetchResourcesType<void, void, I_User>;
+    };
+    [FetchResources.GET_USER_BY_ID]: {
+        [Methods.GET]: FetchResourcesType<{ id: string }, void, I_User>;
+    };
+    [FetchResources.USERS]: {
+        [Methods.GET]: FetchResourcesType<void, void, I_User[]>;
+        [Methods.PUT]: FetchResourcesType<void, I_ModifyUser, string>;
+    };
+    [FetchResources.FRIENDS]: {
+        [Methods.GET]: FetchResourcesType<void, void, I_User[]>;
+        [Methods.PUT]: FetchResourcesType<void, I_FriendRequestParams, void>;
+        [Methods.DELETE]: FetchResourcesType<void, { id: string }>;
+        [Methods.POST]: FetchResourcesType<void, { id: string }>;
+    };
+    [FetchResources.FRIENDS_REQUESTS]: {
+        [Methods.GET]: FetchResourcesType<void, void, I_User[]>;
+    };
+    [FetchResources.FRIENDS_REQUESTS_SENT]: {
+        [Methods.GET]: FetchResourcesType<void, void, I_User[]>;
+    };
 };
 
-export type ResourceParams<R extends FetchResources> =
-    ResourcesProps[R]['params'];
-export type ResourceUrlParams<R extends FetchResources> =
-    ResourcesProps[R]['url'];
-export type ResourceReturns<R extends FetchResources> =
-    ResourcesProps[R]['returns'];
-export type ResourceMethods<R extends FetchResources> =
-    ResourcesProps[R]['methods'];
+export type ResourceMethods<R extends FetchResources> = keyof ResourcesProps[R];
 
-export type ResourceHasUrlParams<R extends FetchResources> =
-    ResourceUrlParams<R> extends void | null | undefined ? false : true;
+export type ResourceParams<
+    R extends FetchResources,
+    M extends ResourceMethods<R>
+> = ResourcesProps[R][M] extends FetchResourcesType<any, infer P, any>
+    ? P
+    : never;
 
-export type FetchResourcesCallback<R extends FetchResources> = (
-    body: ResourceParams<R>
-) => Promise<void>;
+export type ResourceUrlParams<
+    R extends FetchResources,
+    M extends ResourceMethods<R>
+> = ResourcesProps[R][M] extends FetchResourcesType<infer U, any, any>
+    ? U
+    : never;
+
+export type ResourceReturns<
+    R extends FetchResources,
+    M extends ResourceMethods<R>
+> = ResourcesProps[R][M] extends FetchResourcesType<any, any, infer T>
+    ? T
+    : never;
+
+export type ResourceHasUrlParams<
+    R extends FetchResources,
+    M extends ResourceMethods<R>
+> = ResourceUrlParams<R, M> extends void | null | undefined ? false : true;
+
+export type FetchResourcesCallback<
+    R extends FetchResources,
+    M extends ResourceMethods<R>
+> = (body: ResourceParams<R, M>) => Promise<void>;
