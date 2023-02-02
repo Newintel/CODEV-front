@@ -7,7 +7,7 @@ import {
     DrawerItemList,
 } from '@react-navigation/drawer';
 import { E_MenuType, T_Menu } from '../../../types';
-import { Text } from 'native-base';
+import { Text, View } from 'native-base';
 import { StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import useEncryptedStorage from '../../../hooks/useEncryptedStorage';
@@ -39,7 +39,9 @@ const DrawerContent = (
         <DrawerContentScrollView
             {...props}
             contentContainerStyle={style.drawer}>
-            <DrawerItemList {...props} />
+            <View>
+                <DrawerItemList {...props} />
+            </View>
             {props.logged ? (
                 <DrawerItem
                     style={style.logout}
