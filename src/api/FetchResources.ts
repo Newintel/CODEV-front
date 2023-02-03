@@ -4,7 +4,7 @@ import {
     I_NFCLoginRequest as I_NfcLoginRequest,
 } from './resources/auth';
 import { I_Room } from './resources/room';
-import { I_ModifyUser, I_User } from './resources/user';
+import { I_ModifyUser, I_User, I_UserFilter } from './resources/user';
 import { I_FriendRequestParams } from './resources/friend';
 
 /**
@@ -42,10 +42,11 @@ export enum Methods {
  * @param T The type of the data that the resource returns.
  * @param M The method(s) that the resource uses.
  */
-export interface FetchResourcesType<U = void, P = void, R = void> {
+export interface FetchResourcesType<U = void, P = void, R = void, F = void> {
     url: U;
     params: P;
     returns: R;
+    filter?: F;
 }
 
 export type ResourcesProps = {
@@ -81,7 +82,7 @@ export type ResourcesProps = {
         [Methods.GET]: FetchResourcesType<{ id: string }, void, I_User>;
     };
     [FetchResources.USERS]: {
-        [Methods.GET]: FetchResourcesType<void, void, I_User[]>;
+        [Methods.GET]: FetchResourcesType<void, void, I_User[], I_UserFilter>;
         [Methods.PUT]: FetchResourcesType<void, I_ModifyUser, string>;
     };
     [FetchResources.FRIENDS]: {
@@ -103,21 +104,36 @@ export type ResourceMethods<R extends FetchResources> = keyof ResourcesProps[R];
 export type ResourceParams<
     R extends FetchResources,
     M extends ResourceMethods<R>
-> = ResourcesProps[R][M] extends FetchResourcesType<any, infer P, any>
+> = ResourcesProps[R][M] extends FetchResourcesType<
+    unknown,
+    infer P,
+    unknown,
+    unknown
+>
     ? P
     : never;
 
 export type ResourceUrlParams<
     R extends FetchResources,
     M extends ResourceMethods<R>
-> = ResourcesProps[R][M] extends FetchResourcesType<infer U, any, any>
+> = ResourcesProps[R][M] extends FetchResourcesType<
+    infer U,
+    unknown,
+    unknown,
+    unknown
+>
     ? U
     : never;
 
 export type ResourceReturns<
     R extends FetchResources,
     M extends ResourceMethods<R>
-> = ResourcesProps[R][M] extends FetchResourcesType<any, any, infer T>
+> = ResourcesProps[R][M] extends FetchResourcesType<
+    unknown,
+    unknown,
+    infer T,
+    unknown
+>
     ? T
     : never;
 
@@ -125,6 +141,18 @@ export type ResourceHasUrlParams<
     R extends FetchResources,
     M extends ResourceMethods<R>
 > = ResourceUrlParams<R, M> extends void | null | undefined ? false : true;
+
+export type ResourceFilter<
+    R extends FetchResources,
+    M extends ResourceMethods<R>
+> = ResourcesProps[R][M] extends FetchResourcesType<
+    unknown,
+    unknown,
+    unknown,
+    infer F
+>
+    ? F
+    : never;
 
 export type FetchResourcesCallback<
     R extends FetchResources,

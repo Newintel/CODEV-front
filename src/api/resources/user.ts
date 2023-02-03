@@ -8,3 +8,7 @@ export interface I_User extends WithEdges<{ friends?: I_User }> {
 }
 
 export interface I_ModifyUser extends Pick<I_User, 'firstname' | 'lastname'> {}
+
+export interface I_UserFilter {
+    name: string;
+}
