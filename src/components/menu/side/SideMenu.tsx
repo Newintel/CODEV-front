@@ -60,7 +60,7 @@ const DrawerContent = (
                                     index: 0,
                                     routes: [
                                         {
-                                            name: E_Screens.Main,
+                                            name: E_Screens.Login,
                                         },
                                     ],
                                 });
