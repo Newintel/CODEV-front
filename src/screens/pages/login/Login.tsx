@@ -18,7 +18,7 @@ import {
     VStack,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
-import { FetchResources } from '../../../api/FetchResources';
+import { FetchResources, Methods } from '../../../api/FetchResources';
 import RegisterModal from '../../../components/RegisterModal';
 import E_Screens from '../../screens';
 import { AppState } from 'react-native';
@@ -75,7 +75,7 @@ const Login = () => {
         isFetching: isLoginFetching,
     } = useFetchResources({
         resource: FetchResources.LOGIN,
-        method: 'POST',
+        method: Methods.POST,
     });
 
     const {
@@ -84,7 +84,7 @@ const Login = () => {
         isFetching: isNfcLoginFetching,
     } = useFetchResources({
         resource: FetchResources.LOGIN_NFC,
-        method: 'POST',
+        method: Methods.POST,
     });
 
     const {
@@ -94,7 +94,7 @@ const Login = () => {
         isFetched: isRegisterFetched,
     } = useFetchResources({
         resource: FetchResources.SIGNUP,
-        method: 'POST',
+        method: Methods.POST,
     });
 
     const {
@@ -103,7 +103,7 @@ const Login = () => {
         isError: tokenIsInvalid,
     } = useFetchResources({
         resource: FetchResources.CHECK_TOKEN,
-        method: 'GET',
+        method: Methods.GET,
     });
 
     const [email, setEmail] = React.useState('');

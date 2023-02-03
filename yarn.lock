@@ -3429,6 +3429,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash@npm:^4.14.191":
+  version: 4.14.191
+  resolution: "@types/lodash@npm:4.14.191"
+  checksum: ba0d5434e10690869f32d5ea49095250157cae502f10d57de0a723fd72229ce6c6a4979576f0f13e0aa9fbe3ce2457bfb9fa7d4ec3d6daba56730a51906d1491
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:*":
   version: 18.11.18
   resolution: "@types/node@npm:18.11.18"
@@ -6599,6 +6606,7 @@ __metadata:
     "@reduxjs/toolkit": ^1.9.2
     "@tsconfig/react-native": ^2.0.2
     "@types/jest": ^26.0.23
+    "@types/lodash": ^4.14.191
     "@types/react": ^18.0.24
     "@types/react-dom": ^18.0.8
     "@types/react-native": ^0.70.0
@@ -6610,6 +6618,7 @@ __metadata:
     babel-jest: ^26.6.3
     eslint: ^7.32.0
     jest: ^26.6.3
+    lodash: ^4.17.21
     metro-react-native-babel-preset: ^0.72.1
     moment: ^2.29.4
     native-base: ^3.4.25
@@ -6624,6 +6633,7 @@ __metadata:
     react-native-safe-area-context: 3.3.2
     react-native-screens: ^3.18.2
     react-native-svg: 12.1.1
+    react-native-swipe-list-view: ^3.2.9
     react-native-vector-icons: ^9.2.0
     react-redux: ^8.0.5
     react-test-renderer: 18.1.0
@@ -10966,6 +10976,17 @@ __metadata:
     react: "*"
     react-native: ">=0.50.0"
   checksum: 20a9b2987bf5836821e51a0497fc2b598a859032fe168f80c6dcab3727bf26dc34bcb3197059e1e5775dfc91b6b20633502292d8c82e9aeb3e76807d03e0189d
+  languageName: node
+  linkType: hard
+
+"react-native-swipe-list-view@npm:^3.2.9":
+  version: 3.2.9
+  resolution: "react-native-swipe-list-view@npm:3.2.9"
+  peerDependencies:
+    prop-types: ">=15.5.0"
+    react: ">=0.14.8"
+    react-native: ">=0.23.1"
+  checksum: e6fa7f60bcdffdffe0567144e01f4e53b78eff2dfb7f5bad0f560336d039afc5b02603281b5ef0c8b0de86f1cd94c50f943676f25c3f42cc390bedb02df9536d
   languageName: node
   linkType: hard
 
