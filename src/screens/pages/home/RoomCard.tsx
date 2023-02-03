@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Divider, Pressable, Text, VStack } from 'native-base';
+import { Center, Divider, HStack, Pressable, Text, VStack } from 'native-base';
 import React, { useMemo } from 'react';
 import { I_Room } from '../../../api/resources/room';
 
@@ -12,7 +12,7 @@ const RoomCard = (props: I_Props) => {
         room: {
             end,
             edges: {
-                rooms: { name },
+                rooms: { name, floor, building },
             },
         },
     } = props;
@@ -29,9 +29,21 @@ const RoomCard = (props: I_Props) => {
             my="3"
             borderWidth={1}>
             <VStack>
-                <Text textAlign={'center'}>{name}</Text>
+                <Center>
+                    <HStack>
+                        <Text textAlign={'center'} mr="2">
+                            {building}
+                        </Text>
+                        <Text textAlign={'center'}>{name}</Text>
+                    </HStack>
+                </Center>
                 <Divider />
-                <Text>{`Free until ${endTime.format('LT')}`}</Text>
+                <HStack flex="1" justifyContent={'space-between'}>
+                    <Text textAlign={'center'} ml="2">
+                        Floor: {floor}
+                    </Text>
+                    <Text mr="2">{`Free until ${endTime.format('LT')}`}</Text>
+                </HStack>
             </VStack>
         </Pressable>
     );
