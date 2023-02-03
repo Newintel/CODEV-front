@@ -225,7 +225,7 @@ const Login = () => {
     return (
         <View flex={1} backgroundColor={'blue.100'}>
             <Square mx="auto" height={'25%'}>
-                <Heading>Welcome to our app!</Heading>
+                <Heading>Welcome to Polytips!</Heading>
             </Square>
             <Box height={'55%'}>
                 <Center flex={1}>
