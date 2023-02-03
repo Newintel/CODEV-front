@@ -1,6 +1,8 @@
 import { WithEdges } from './api';
-export interface I_Room extends WithEdges<{ room: I_InternalRoom }> {
-    freeTime: number;
+export interface I_Room extends WithEdges<{ rooms: I_InternalRoom }> {
+    start: string;
+    end: string;
+    id: number;
 }
 
 export interface I_InternalRoom {

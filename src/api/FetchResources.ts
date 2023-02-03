@@ -6,6 +6,7 @@ import {
 import { I_Room } from './resources/room';
 import { I_ModifyUser, I_User, I_UserFilter } from './resources/user';
 import { I_FriendRequestParams } from './resources/friend';
+import { I_BookingRequest } from './resources/booking';
 
 /**
  * @description
@@ -26,6 +27,10 @@ export enum FetchResources {
     FRIENDS = 'friends',
     FRIENDS_REQUESTS = 'friends/requests',
     FRIENDS_REQUESTS_SENT = 'friends/requests/sent',
+    BOOKINGS = 'bookings',
+    EVENTS = 'events',
+    EVENTS_MODIFY = 'events/:id',
+    EVENT_INVITE = 'events/invite',
 }
 
 export enum Methods {
@@ -38,9 +43,10 @@ export enum Methods {
 /**
  * @description
  * This interface is used to define the properties of a resource.
+ * @param U The type of the URL parameters that the resource accepts.
  * @param P The type of the parameters that the resource accepts.
- * @param T The type of the data that the resource returns.
- * @param M The method(s) that the resource uses.
+ * @param R The type of the data that the resource returns.
+ * @param F The type of the filter that the resource accepts.
  */
 export interface FetchResourcesType<U = void, P = void, R = void, F = void> {
     url: U;
@@ -73,7 +79,12 @@ export type ResourcesProps = {
         [Methods.GET]: FetchResourcesType<void, void, I_AuthCheckResponse>;
     };
     [FetchResources.EMPTY_ROOMS]: {
-        [Methods.GET]: FetchResourcesType<void, void, I_Room[]>;
+        [Methods.GET]: FetchResourcesType<
+            void,
+            void,
+            I_Room[],
+            { time: string }
+        >;
     };
     [FetchResources.GET_USER]: {
         [Methods.GET]: FetchResourcesType<void, void, I_User>;
@@ -96,6 +107,21 @@ export type ResourcesProps = {
     };
     [FetchResources.FRIENDS_REQUESTS_SENT]: {
         [Methods.GET]: FetchResourcesType<void, void, I_User[]>;
+    };
+    [FetchResources.BOOKINGS]: {
+        [Methods.GET]: FetchResourcesType<void, void, void>;
+        [Methods.POST]: FetchResourcesType<void, I_BookingRequest, void>;
+    };
+    [FetchResources.EVENTS]: {
+        [Methods.GET]: FetchResourcesType<void, void, void>;
+        [Methods.POST]: FetchResourcesType<void, void, void>;
+    };
+    [FetchResources.EVENTS_MODIFY]: {
+        [Methods.PUT]: FetchResourcesType<{ id: string }, void, void>;
+        [Methods.DELETE]: FetchResourcesType<{ id: string }, void, void>;
+    };
+    [FetchResources.EVENT_INVITE]: {
+        [Methods.POST]: FetchResourcesType<void, void, void>;
     };
 };
 
