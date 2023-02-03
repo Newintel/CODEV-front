@@ -1,4 +1,4 @@
-import moment, { duration } from 'moment';
+import moment from 'moment';
 import { Box, Divider, Text } from 'native-base';
 import React, { useMemo } from 'react';
 import { I_Room } from '../api/resources/room';
@@ -10,23 +10,14 @@ interface I_Props {
 const RoomCard = (props: I_Props) => {
     const {
         room: {
+            end,
             edges: {
-                room: { name },
+                rooms: { name },
             },
-            freeTime,
         },
     } = props;
 
-    const currentTime = useMemo(() => moment(), []);
-    const endTime = useMemo(
-        () =>
-            currentTime.add(
-                duration({
-                    minutes: freeTime,
-                })
-            ),
-        [currentTime, freeTime]
-    );
+    const endTime = useMemo(() => moment(end), [end]);
 
     return (
         <Box
