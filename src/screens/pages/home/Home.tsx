@@ -1,10 +1,10 @@
 import _ from 'lodash';
 import moment from 'moment';
-import { Center, Heading, ScrollView, Spinner } from 'native-base';
+import { Center, Heading, ScrollView } from 'native-base';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { RefreshControl } from 'react-native';
 import { FetchResources, Methods } from '../../../api/FetchResources';
-import RoomCard from '../../../components/RoomCard';
+import RoomCard from './RoomCard';
 import useFetchResources from '../../../hooks/useFetchResources';
 
 const Home = () => {
@@ -20,15 +20,14 @@ const Home = () => {
 
     const update = useCallback(() => {
         setUrlParams({ time: moment().toISOString() });
-        fetchData();
-    }, [setUrlParams, fetchData]);
+    }, [setUrlParams]);
 
     useEffect(() => {
-        update();
-    }, [update]);
+        fetchData();
+    }, [fetchData]);
 
     const data = useMemo(() => {
-        return _data ? _.sortBy(_data, 'edges.rooms.name') : [];
+        return _.sortBy(_data ?? [], 'edges.rooms.name');
     }, [_data]);
 
     return (
@@ -39,7 +38,6 @@ const Home = () => {
             <Center>
                 <Heading my="2">Free rooms</Heading>
             </Center>
-            {isFetching && <Spinner size={'lg'}>Loading</Spinner>}
             {data.map((room, id) => (
                 <RoomCard key={id} room={room} />
             ))}

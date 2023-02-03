@@ -1,7 +1,7 @@
 import moment from 'moment';
-import { Box, Divider, Text } from 'native-base';
+import { Divider, Pressable, Text, VStack } from 'native-base';
 import React, { useMemo } from 'react';
-import { I_Room } from '../api/resources/room';
+import { I_Room } from '../../../api/resources/room';
 
 interface I_Props {
     room: I_Room;
@@ -20,18 +20,20 @@ const RoomCard = (props: I_Props) => {
     const endTime = useMemo(() => moment(end), [end]);
 
     return (
-        <Box
+        <Pressable
             width="75%"
             textAlign="center"
-            backgroundColor="red.400"
+            backgroundColor="red.300"
             alignSelf="center"
             rounded="md"
             my="3"
             borderWidth={1}>
-            <Text textAlign={'center'}>{name}</Text>
-            <Divider />
-            {`Free until ${endTime.format('LT')}`}
-        </Box>
+            <VStack>
+                <Text textAlign={'center'}>{name}</Text>
+                <Divider />
+                <Text>{`Free until ${endTime.format('LT')}`}</Text>
+            </VStack>
+        </Pressable>
     );
 };
 

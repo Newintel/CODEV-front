@@ -21,6 +21,7 @@ interface I_Props<R extends FetchResources, M extends ResourceMethods<R>> {
     resource_params: ResourceHasUrlParams<R, M> extends true
         ? ResourceUrlParams<R, M>
         : never;
+    reloadOnParamsChange?: boolean;
 }
 
 type T_Props<
@@ -77,14 +78,13 @@ const useFetchResources = <
     }, [resource, resource_params]);
 
     const resource_filters = useMemo(() => {
-        const params = urlParams;
-        if (params) {
+        if (urlParams) {
             const filters = (
-                Object.entries(params)
-                    .map((key, value) =>
+                Object.entries(urlParams)
+                    .map(([key, value]) =>
                         value ? `${key}=${value}` : undefined
                     )
-                    .filter(Boolean) as string[]
+                    .filter(t => t !== undefined) as string[]
             ).join('&');
 
             if (filters) {
