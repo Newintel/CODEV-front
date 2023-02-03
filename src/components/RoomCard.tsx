@@ -9,7 +9,12 @@ interface I_Props {
 
 const RoomCard = (props: I_Props) => {
     const {
-        room: { name, freeTime },
+        room: {
+            edges: {
+                room: { name },
+            },
+            freeTime,
+        },
     } = props;
 
     const currentTime = useMemo(() => moment(), []);

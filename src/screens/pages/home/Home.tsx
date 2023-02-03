@@ -23,7 +23,9 @@ const Home = () => {
             <Text>Free rooms</Text>
             {isFetching && <Spinner size={'lg'}>Loading</Spinner>}
             {data
-                ?.sort((a, b) => (a.name > b.name ? 1 : -1))
+                ?.sort((a, b) =>
+                    a.edges.room.name > b.edges.room.name ? 1 : -1
+                )
                 .map((room, id) => (
                     <RoomCard key={id} room={room} />
                 ))}

@@ -1,10 +1,11 @@
 import { Box, HStack, Text, VStack, Divider } from 'native-base';
 import React from 'react';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import { I_User } from '../../../api/resources/user';
+import { I_User } from '../../api/resources/user';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { capitalize } from '../../utils';
 
-const FriendListItem: NonNullable<
+const UsersListItem: NonNullable<
     SwipeListView<I_User>['props']['renderItem']
 > = ({ item }) => {
     return (
@@ -13,11 +14,15 @@ const FriendListItem: NonNullable<
                 <VStack>
                     <HStack>
                         <Text bold mr="1">
-                            {item.lastname ??
-                                item.email.split('@')[0].split('.')[1]}
+                            {capitalize(
+                                item.lastname ??
+                                    item.email.split('@')[0].split('.')[1]
+                            )}
                         </Text>
                         <Text bold>
-                            {item.firstname ?? item.email.split('.')[0]}
+                            {capitalize(
+                                item.firstname ?? item.email.split('.')[0]
+                            )}
                         </Text>
                     </HStack>
                     <HStack>
@@ -39,4 +44,4 @@ const FriendListItem: NonNullable<
     );
 };
 
-export default FriendListItem;
+export default UsersListItem;

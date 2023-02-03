@@ -1,9 +1,9 @@
 import React from 'react';
 import { Center, HStack, Pressable } from 'native-base';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import { I_User } from '../../../api/resources/user';
+import { I_User } from '../../api/resources/user';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { MapEnum } from '../../../utils';
+import { MapEnum } from '../../utils';
 import { ColorType } from 'native-base/lib/typescript/components/types';
 
 export enum E_FriendActions {
@@ -42,7 +42,7 @@ const BgColor = MapEnum<typeof E_FriendActions, ColorType>(E_FriendActions)({
     _: 'white',
 });
 
-const FriendActionCallback =
+const UserActionCallback =
     ({ addFriend, deleteFriend, friendDecision }: I_Props) =>
     (action: E_FriendActions, id: string) =>
         MapEnum<typeof E_FriendActions, () => void>(E_FriendActions)({
@@ -54,7 +54,7 @@ const FriendActionCallback =
             _: () => {},
         })(action);
 
-const FriendActionWidget = (props: I_Props & { action: E_FriendActions }) => {
+const UserActionWidget = (props: I_Props & { action: E_FriendActions }) => {
     const {
         actions,
         itemProps: [{ item: friend }],
@@ -63,7 +63,7 @@ const FriendActionWidget = (props: I_Props & { action: E_FriendActions }) => {
 
     return (
         <Pressable
-            onPress={FriendActionCallback(props)(action, friend.id)}
+            onPress={UserActionCallback(props)(action, friend.id)}
             ml={actions.indexOf(action) === 0 ? 'auto' : '0'}
             w="60"
             bgColor={BgColor(action)}
@@ -79,16 +79,16 @@ const FriendActionWidget = (props: I_Props & { action: E_FriendActions }) => {
     );
 };
 
-const FriendActions = (props: I_Props) => {
+const UserActions = (props: I_Props) => {
     const { actions } = props;
 
     return (
         <HStack flex="1">
             {actions.map((action, item) => (
-                <FriendActionWidget {...props} action={action} key={item} />
+                <UserActionWidget {...props} action={action} key={item} />
             ))}
         </HStack>
     );
 };
 
-export default FriendActions;
+export default UserActions;

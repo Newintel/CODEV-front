@@ -7,7 +7,11 @@ import {
     ResourceUrlParams,
     ResourceHasUrlParams,
 } from '../api/FetchResources';
-import { FetchResources, ResourceMethods } from '../api/FetchResources';
+import {
+    FetchResources,
+    ResourceMethods,
+    ResourceFilter,
+} from '../api/FetchResources';
 import useEncryptedStorage from './useEncryptedStorage';
 import E_Storage from '../storage/storage';
 
@@ -49,6 +53,7 @@ const useFetchResources = <
     const [isFetching, setIsFetching] = useState(false);
     const [isFetched, setIsFetched] = useState(false);
     const [isError, setIsError] = useState(false);
+    const [urlParams, setUrlParams] = useState<ResourceFilter<R, M>>();
 
     const { api_url } = useConfig();
 
@@ -71,6 +76,23 @@ const useFetchResources = <
         return _resource;
     }, [resource, resource_params]);
 
+    const resource_filters = useMemo(() => {
+        const params = urlParams;
+        if (params) {
+            const filters = (
+                Object.entries(params)
+                    .map((key, value) =>
+                        value ? `${key}=${value}` : undefined
+                    )
+                    .filter(Boolean) as string[]
+            ).join('&');
+
+            if (filters) {
+                return `?${filters}`;
+            }
+        }
+    }, [urlParams]);
+
     const fetchData = useCallback<FetchResourcesCallback<R, M>>(
         async (body?: ResourceParams<R, M>) => {
             setIsFetching(true);
@@ -87,17 +109,22 @@ const useFetchResources = <
                   }
                 : undefined;
 
-            await fetch(`${api_url}/${resource_url}`, {
+            await fetch(`${api_url}/${resource_url}${resource_filters ?? ''}`, {
                 method: method.toString(),
                 body: JSON.stringify(body),
                 headers,
             })
                 .then(async res => {
                     if (res.ok) {
-                        res.json().then(json => {
-                            setData(json);
-                            setIsFetched(true);
-                        });
+                        res.json()
+                            .then(json => {
+                                setData(json);
+                                setIsFetched(true);
+                            })
+                            .catch(() => {
+                                setIsFetched(true);
+                                setIsError(true);
+                            });
                     } else {
                         setIsError(true);
                     }
@@ -109,10 +136,10 @@ const useFetchResources = <
                     setIsFetching(false);
                 });
         },
-        [api_url, getItem, method, resource_url]
+        [api_url, getItem, method, resource_filters, resource_url]
     );
 
-    return { data, isFetching, fetchData, isFetched, isError };
+    return { data, isFetching, fetchData, isFetched, isError, setUrlParams };
 };
 
 export default useFetchResources;

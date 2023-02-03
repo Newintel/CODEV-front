@@ -1,11 +1,13 @@
-import { Box, Center, Heading } from 'native-base';
+import { Box, Center, Heading, ScrollView } from 'native-base';
 import React, { useEffect } from 'react';
 import { RefreshControl } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { FetchResources, Methods } from '../../../api/FetchResources';
 import useFetchResources from '../../../hooks/useFetchResources';
-import FriendActions, { E_FriendActions } from './FriendActions';
-import FriendListItem from './FriendListItem';
+import UserActions, {
+    E_FriendActions,
+} from '../../../components/usersList/UserActions';
+import UsersListItem from '../../../components/usersList/UsersListItem';
 
 const Friends = () => {
     const {
@@ -39,9 +41,9 @@ const Friends = () => {
                 {friends?.length ? (
                     <SwipeListView
                         data={friends}
-                        renderItem={FriendListItem}
+                        renderItem={UsersListItem}
                         renderHiddenItem={(...props) =>
-                            FriendActions({
+                            UserActions({
                                 actions: [E_FriendActions.REMOVE_FRIEND],
                                 itemProps: props,
                                 deleteFriend: id => deleteFriend({ id }),
@@ -58,9 +60,18 @@ const Friends = () => {
                         previewOpenDelay={3000}
                     />
                 ) : (
-                    <Center flex="1">
-                        <Heading>No friends yet</Heading>
-                    </Center>
+                    <ScrollView
+                        h="100%"
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={isFetching}
+                                onRefresh={getFriends}
+                            />
+                        }>
+                        <Center flex="1">
+                            <Heading>No friends yet</Heading>
+                        </Center>
+                    </ScrollView>
                 )}
             </Box>
         </Center>

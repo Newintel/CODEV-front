@@ -4,8 +4,10 @@ import { RefreshControl } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { FetchResources, Methods } from '../../../api/FetchResources';
 import useFetchResources from '../../../hooks/useFetchResources';
-import FriendActions, { E_FriendActions } from './FriendActions';
-import FriendListItem from './FriendListItem';
+import UserActions, {
+    E_FriendActions,
+} from '../../../components/usersList/UserActions';
+import UsersListItem from '../../../components/usersList/UsersListItem';
 
 const FriendRequests = () => {
     const {
@@ -22,7 +24,7 @@ const FriendRequests = () => {
         fetchData: getSent,
         isFetching: isFetchingSent,
     } = useFetchResources({
-        resource: FetchResources.FRIENDS_REQUESTS,
+        resource: FetchResources.FRIENDS_REQUESTS_SENT,
         method: Methods.GET,
     });
 
@@ -71,9 +73,9 @@ const FriendRequests = () => {
                     {received?.length ? (
                         <SwipeListView
                             data={received}
-                            renderItem={FriendListItem}
+                            renderItem={UsersListItem}
                             renderHiddenItem={(...props) =>
-                                FriendActions({
+                                UserActions({
                                     actions: receivedActions,
                                     itemProps: props,
                                     friendDecision: (id, accepted) =>
@@ -110,9 +112,9 @@ const FriendRequests = () => {
                     {sent?.length ? (
                         <SwipeListView
                             data={sent}
-                            renderItem={FriendListItem}
+                            renderItem={UsersListItem}
                             renderHiddenItem={(...props) =>
-                                FriendActions({
+                                UserActions({
                                     actions: sentActions,
                                     itemProps: props,
                                     deleteFriend: id => cancelRequest({ id }),
