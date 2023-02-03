@@ -24,7 +24,7 @@ const FriendRequests = () => {
         fetchData: getSent,
         isFetching: isFetchingSent,
     } = useFetchResources({
-        resource: FetchResources.FRIENDS_REQUESTS,
+        resource: FetchResources.FRIENDS_REQUESTS_SENT,
         method: Methods.GET,
     });
 

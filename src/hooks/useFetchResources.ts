@@ -119,12 +119,11 @@ const useFetchResources = <
                         res.json()
                             .then(json => {
                                 setData(json);
+                                setIsFetched(true);
                             })
                             .catch(() => {
-                                setIsError(true);
-                            })
-                            .finally(() => {
                                 setIsFetched(true);
+                                setIsError(true);
                             });
                     } else {
                         setIsError(true);
